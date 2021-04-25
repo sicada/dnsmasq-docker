@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+  dnsmasq:
+    container_name: dnsmasq
+    image: sicadaco/dnsmasq:latest
+    cap_add:
+      # This capability is needed to allow binding of ports < 1024 on the
+      # host since we're using host networking mode.
+      - NET_ADMIN
+    restart: always
+    environment:
+      # Define at least these variables in this section or, define them
+      # in an .env file and list the file in the "env_file" section below.
+      # - HTTP_USER=admin
+      # - HTTP_PASS=admin
+    env_file:
+      - ./dnsmasq/.env
+    volumes:
+      # These don't have to be exposed back to the docker host, but I
+      # prefer it so you can inspect them without having to "docker exec"
+      # into the container, which adds extra steps.
+      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+      - ./dnsmasq/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
+    ports:
+      # NOTE: These don't do anything since we're using host network mode,
+      # but are listed here anyway for informational purposes...
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "68:68/udp"
+      - "8080:8080/tcp"
+    network_mode: "host"
